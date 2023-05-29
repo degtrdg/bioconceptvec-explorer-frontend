@@ -26,16 +26,19 @@ const App: React.FC = () => {
     const pieces = token.split(" ").filter((t) => t !== "");
     pieces.forEach((piece) => {
       if (validTokens.includes(piece)) {
-        // Add a valid token to the equation
         setEquation((prev) => {
           const updatedTokens = [
             ...prev[selectedSide],
             { type: "token", value: piece },
           ];
-          return { ...prev, [selectedSide]: updatedTokens };
+          const updatedEquation = { ...prev, [selectedSide]: updatedTokens };
+          console.log("Updated Equation:", updatedEquation); // Log the updated equation
+          return updatedEquation;
         });
-      } else if (validOperators.includes(piece)) {
-        // Add a valid operator to the equation
+      } else if (
+        validOperators.includes(piece) &&
+        equation[selectedSide].length
+      ) {
         setEquation((prev) => {
           const lastToken = prev[selectedSide][prev[selectedSide].length - 1];
           if (lastToken?.type !== "operator") {
@@ -43,7 +46,9 @@ const App: React.FC = () => {
               ...prev[selectedSide],
               { type: "operator", value: piece },
             ];
-            return { ...prev, [selectedSide]: updatedTokens };
+            const updatedEquation = { ...prev, [selectedSide]: updatedTokens };
+            console.log("Updated Equation:", updatedEquation); // Log the updated equation
+            return updatedEquation;
           }
           return prev;
         });
