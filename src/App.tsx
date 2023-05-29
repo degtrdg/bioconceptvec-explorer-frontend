@@ -16,6 +16,10 @@ const App: React.FC = () => {
   const [input, setInput] = useState("");
   const [selectedSide, setSelectedSide] = useState<"left" | "right">("left");
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedToken, setSelectedToken] = useState<{
+    side: "left" | "right";
+    index: number;
+  } | null>(null);
 
   // Arrays of valid tokens and operators
   const validTokens = ["apple", "banana", "cherry"];
@@ -110,19 +114,22 @@ const App: React.FC = () => {
   // useEffect to handle backspace
   useEffect(() => {
     const handleBackspace = (event: KeyboardEvent) => {
-      if (event.key === "Backspace" && input === "") {
-        // Remove the last token from the equation when backspace is pressed
+      if (event.key === "Backspace" && input === "" && selectedToken) {
         setEquation((prev) => {
-          const updatedTokens = [...prev[selectedSide]];
-          updatedTokens.pop();
-          return { ...prev, [selectedSide]: updatedTokens };
+          const updatedTokens = [...prev[selectedToken.side]];
+          updatedTokens.splice(selectedToken.index, 1);
+          if (updatedTokens[selectedToken.index]?.type === "operator") {
+            updatedTokens.splice(selectedToken.index, 1);
+          }
+          return { ...prev, [selectedToken.side]: updatedTokens };
         });
+        setSelectedToken(null);
       }
     };
 
     window.addEventListener("keydown", handleBackspace);
     return () => window.removeEventListener("keydown", handleBackspace);
-  }, [selectedSide, input]);
+  }, [selectedSide, input, selectedToken]);
 
   return (
     <div className="App flex items-center justify-center h-screen">
@@ -136,7 +143,12 @@ const App: React.FC = () => {
             key={index}
             className={`px-2 py-1 rounded ${
               token.type === "token" ? "bg-green-200" : "bg-blue-200"
+            } ${
+              selectedToken?.side === "left" && selectedToken?.index === index
+                ? "border-2 border-red-500"
+                : ""
             }`}
+            onClick={() => setSelectedToken({ side: "left", index })}
           >
             {token.value}
           </div>
@@ -168,11 +180,16 @@ const App: React.FC = () => {
             key={index}
             className={`px-2 py-1 rounded ${
               token.type === "token" ? "bg-green-200" : "bg-blue-200"
+            } ${
+              selectedToken?.side === "right" && selectedToken?.index === index
+                ? "border-2 border-red-500"
+                : ""
             }`}
+            onClick={() => setSelectedToken({ side: "right", index })}
           >
             {token.value}
           </div>
-        ))}
+        ))}{" "}
         {/* Render an input field on the right side if it is selected and focused */}
         {selectedSide === "right" && isFocused && (
           <div
