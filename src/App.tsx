@@ -1,11 +1,50 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import Autosuggest from "react-autosuggest";
+import { StyleSheet, css } from "aphrodite";
 
 // Interface for token objects
 interface Token {
   type: "token" | "operator";
   value: string;
 }
+
+const autosuggestStyles = StyleSheet.create({
+  container: {
+    position: "relative",
+  },
+  suggestionsContainer: {
+    position: "absolute",
+    zIndex: 1,
+    marginTop: "2px",
+    backgroundColor: "#fff",
+    width: "100%",
+    border: "1px solid #d9d9d9",
+    borderRadius: "4px",
+  },
+  suggestion: {
+    padding: "10px 20px",
+    cursor: "pointer",
+  },
+  suggestionHighlighted: {
+    backgroundColor: "#f0f0f0", // Customize the background color for the highlighted suggestion
+  },
+  input: {
+    width: "100%",
+    height: "30px",
+    padding: "0.375rem 0.75rem",
+    borderWidth: "1px",
+    borderRadius: "0.25rem",
+  },
+});
+
+// Apply the styles using css() from aphrodite
+const styledAutosuggestStyles = {
+  container: css(autosuggestStyles.container),
+  suggestionsContainer: css(autosuggestStyles.suggestionsContainer),
+  suggestion: css(autosuggestStyles.suggestion),
+  input: css(autosuggestStyles.input),
+};
 
 const App: React.FC = () => {
   // State variables
@@ -20,11 +59,61 @@ const App: React.FC = () => {
     side: "left" | "right";
     index: number;
   } | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // Arrays of valid tokens and operators
-  const validTokens = ["apple", "banana", "cherry"];
+  const validTokens = ["apple", "banana", "bananas", "cherry"];
   const validOperators = ["+", "-"];
 
+  // Function to get suggestions
+  const getSuggestions = (value: string) => {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0
+      ? []
+      : validTokens.filter(
+          (token) => token.toLowerCase().slice(0, inputLength) === inputValue
+        );
+  };
+
+  // Function to get suggestion value
+  const getSuggestionValue = (suggestion: string) => suggestion;
+
+  // Function to render suggestion
+  const renderSuggestion = (suggestion: string, { isHighlighted }: any) => (
+    <div
+      className={
+        isHighlighted
+          ? css(autosuggestStyles.suggestionHighlighted)
+          : css(autosuggestStyles.suggestion)
+      }
+    >
+      {suggestion}
+    </div>
+  );
+
+  // Function to handle input change
+  const onChange = (event: any, { newValue }: any) => {
+    setInput(newValue);
+  };
+
+  // Function to handle suggestions fetch requested
+  const onSuggestionsFetchRequested = ({ value }: any) => {
+    setSuggestions(getSuggestions(value));
+  };
+
+  // Function to handle suggestions clear requested
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
+  // Autosuggest input properties
+  const inputProps = {
+    placeholder: "",
+    value: input,
+    onChange: onChange,
+  };
   // Function to validate and add a token to the equation
   const validateAndAddToken = (token: string) => {
     const pieces = token.split(" ").filter((t) => t !== "");
@@ -159,15 +248,18 @@ const App: React.FC = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           >
-            <input
-              type="text"
-              value={input}
-              onChange={handleInputChange}
-              autoComplete="off"
-              className="border px-2 py-1 rounded"
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              inputProps={inputProps}
+              shouldRenderSuggestions={() => true} // This allows empty suggestions to be rendered
+              theme={styledAutosuggestStyles} // Use the styledAutosuggestStyles object
             />
           </div>
-        )}
+        )}{" "}
       </div>
       <div className="mx-4 text-2xl">=</div>
       <div
@@ -196,12 +288,15 @@ const App: React.FC = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           >
-            <input
-              type="text"
-              value={input}
-              onChange={handleInputChange}
-              autoComplete="off"
-              className="border px-2 py-1 rounded"
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              inputProps={inputProps}
+              shouldRenderSuggestions={() => true} // This allows empty suggestions to be rendered
+              theme={styledAutosuggestStyles} // Use the styledAutosuggestStyles object
             />
           </div>
         )}

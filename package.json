@@ -10,7 +10,9 @@
     "@types/node": "^16.18.34",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
+    "aphrodite": "^2.4.0",
     "react": "^18.2.0",
+    "react-autosuggest": "^10.1.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "recoil": "^0.7.7",
@@ -42,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-autosuggest": "^10.1.6",
     "tailwindcss": "^3.3.2"
   }
 }
