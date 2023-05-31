@@ -1,6 +1,8 @@
 import React from "react";
 import EquationCreator from "../components/EquationCreator";
 import ResultsBox from "../components/ResultsBox";
+
+{/* START HERE */ }
 const top_concepts = {
   concept1: 'Value 1',
   concept2: 'Value 2',
@@ -13,6 +15,7 @@ const top_concepts = {
   concept9: 'Value 9',
   concept10: 'Value 10',
 };
+{/* END HERE */ }
 
 
 const HomePage: React.FC = () => {
@@ -28,6 +31,8 @@ const HomePage: React.FC = () => {
 
         <ResultsBox />
       </div>
+
+      {/* START HERE */}
       <div className="w-1/3 border-l pl-6" style={{ height: '90vh', overflow: 'auto' }}>
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           {Object.keys(top_concepts).map((key, index) => (
@@ -36,8 +41,8 @@ const HomePage: React.FC = () => {
             </div>
           ))}
         </div>
-
       </div>
+      {/* END HERE */}
 
     </div>
   );
