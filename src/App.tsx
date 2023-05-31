@@ -1,51 +1,34 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  NavLink,
-} from "react-router-dom";
+import { RecoilRoot, useRecoilValue } from "recoil";
+import { ChakraProvider } from "@chakra-ui/react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import theme from "./theme";
 import HomePage from "./pages/HomePage";
 import ExplorePage from "./pages/ExplorePage";
 
-const App: React.FC = () => {
+import { ColorModeScript } from "@chakra-ui/react";
+import Navbar from "./components/Navbar";
+import { NAV_ITEMS } from "./constants";
+
+import { loadingState } from "./atoms";
+
+function App() {
+  const loading = useRecoilValue(loadingState);
   return (
-    <Router>
-      <nav className="py-4 px-8">
-        <ul className="flex items-center space-x-4">
-          <li>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                isActive
-                  ? "text-gray-900 font-bold"
-                  : "text-gray-600 hover:text-gray-900 transition duration-200"
-              }
-            >
-              Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/explore"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-gray-900 font-bold"
-                  : "text-gray-600 hover:text-gray-900 transition duration-200"
-              }
-            >
-              Explore
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/explore" element={<ExplorePage />} />
-      </Routes>
-    </Router>
+    <>
+      <ColorModeScript initialColorMode="dark" />
+      <ChakraProvider theme={theme}>
+        <BrowserRouter>
+          <Navbar navItems={NAV_ITEMS} loading={loading} />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="*" element={<div>404</div>} />
+          </Routes>
+        </BrowserRouter>
+      </ChakraProvider>
+    </>
   );
-};
+}
 
 export default App;

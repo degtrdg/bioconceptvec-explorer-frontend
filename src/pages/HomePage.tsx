@@ -1,17 +1,38 @@
 import React from "react";
 import EquationCreator from "../components/EquationCreator";
+import { Grid, GridItem } from "@chakra-ui/react";
 
 const HomePage: React.FC = () => {
   return (
-    <div className="flex h-screen p-6 py-0">
-      <div className="flex flex-col w-2/3 pr-6">
-        <div className="border p-6 mb-6 h-1/2">Results go here</div>
-        <div className="border p-6 h-1/2">
-          <EquationCreator />
-        </div>
-      </div>
-      <div className="w-1/3 border-l pl-6">Sidebar goes here</div>
-    </div>
+    <Grid
+      templateAreas={`"controlpanel controlpanel controlpanel"
+                  "searchbar main results"
+                  "searchbar footer footer"`}
+      gridTemplateRows={'2fr 8fr 0.5fr'}
+      gridTemplateColumns={'1fr 5fr 2fr'}
+      h='100vh'
+      pt="10vh"
+      gap='1'
+      color='blackAlpha.700'
+      fontWeight='bold'
+    >
+      <GridItem pl='2' bg='orange.300' area={'controlpanel'}>
+        Control Panel
+      </GridItem>
+      <GridItem pl='2' bg='pink.300' area={'searchbar'}>
+        Concept Search Bar
+      </GridItem>
+      <GridItem pl='2' bg='green.300' area={'main'}>
+        Equation
+        <EquationCreator />
+      </GridItem>
+      <GridItem pl='2' bg='gray.300' area={'results'}>
+        Results
+      </GridItem>
+      <GridItem pl='2' bg='blue.300' area={'footer'}>
+        Footer
+      </GridItem>
+    </Grid>
   );
 };
 
