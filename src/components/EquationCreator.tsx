@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Autosuggest from "react-autosuggest";
 import { StyleSheet, css } from "aphrodite";
+import { Button } from '@mui/material';
+import { styled } from '@mui/system';
+
 
 // Interface for token objects
 interface Token {
@@ -45,6 +48,24 @@ const styledAutosuggestStyles = {
   input: css(autosuggestStyles.input),
 };
 
+const enterButtonStyles = StyleSheet.create({
+  button: {
+    backgroundColor: "#444",
+    border: "1px solid #d9d9d9",
+    borderRadius: "4px",
+    padding: "5px 30px",
+    color: "#fff",
+    cursor: "pointer",
+  },
+});
+
+const CustomButton = styled(Button)({
+  background: '#444',
+  color: '#fff',
+  padding: '5px 20px',
+  textTransform: 'none',
+});
+
 const ExploreCreator: React.FC = () => {
   // State variables
   const [equation, setEquation] = useState<{ left: Token[]; right: Token[] }>({
@@ -72,8 +93,8 @@ const ExploreCreator: React.FC = () => {
     return inputLength === 0
       ? []
       : validTokens.filter(
-          (token) => token.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        (token) => token.toLowerCase().slice(0, inputLength) === inputValue
+      );
   };
 
   // Function to get suggestion value
@@ -184,7 +205,7 @@ const ExploreCreator: React.FC = () => {
         validOperators.includes(token) &&
         equation[selectedSide].length &&
         equation[selectedSide][equation[selectedSide].length - 1]?.type !==
-          "operator"
+        "operator"
       ) {
         // Add a valid operator to the equation
         setEquation((prev) => {
@@ -229,13 +250,11 @@ const ExploreCreator: React.FC = () => {
         {equation.left.map((token, index) => (
           <div
             key={index}
-            className={`px-2 py-1 rounded ${
-              token.type === "token" ? "bg-green-200" : "bg-blue-200"
-            } ${
-              selectedToken?.side === "left" && selectedToken?.index === index
+            className={`px-2 py-1 rounded ${token.type === "token" ? "bg-green-200" : "bg-blue-200"
+              } ${selectedToken?.side === "left" && selectedToken?.index === index
                 ? "border-2 border-red-500"
                 : ""
-            }`}
+              }`}
             onClick={() => setSelectedToken({ side: "left", index })}
           >
             {token.value}
@@ -269,13 +288,11 @@ const ExploreCreator: React.FC = () => {
         {equation.right.map((token, index) => (
           <div
             key={index}
-            className={`px-2 py-1 rounded ${
-              token.type === "token" ? "bg-green-200" : "bg-blue-200"
-            } ${
-              selectedToken?.side === "right" && selectedToken?.index === index
+            className={`px-2 py-1 rounded ${token.type === "token" ? "bg-green-200" : "bg-blue-200"
+              } ${selectedToken?.side === "right" && selectedToken?.index === index
                 ? "border-2 border-red-500"
                 : ""
-            }`}
+              }`}
             onClick={() => setSelectedToken({ side: "right", index })}
           >
             {token.value}
@@ -300,7 +317,18 @@ const ExploreCreator: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+      {/* <button className={
+        css(enterButtonStyles.button)
+      }
+        style={{ marginLeft: "20px" }}
+      >
+        Enter
+      </button> */}
+
+      <div style={{ marginLeft: "20px" }}>
+        <CustomButton variant="contained">Enter</CustomButton>
+      </div>
+    </div >
   );
 };
 
