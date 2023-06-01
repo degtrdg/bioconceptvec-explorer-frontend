@@ -11,6 +11,20 @@ interface Token {
   value: string;
 }
 
+// Some starter code for making the API call
+function handleClick() {
+  // Send data to the backend via POST
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', '<API LINK HERE>');
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const top_concepts = JSON.parse(xhr.responseText);
+      // TODO Pass top_concepts to the explore page.
+    }
+  };
+  xhr.send();
+}
+
 const autosuggestStyles = StyleSheet.create({
   container: {
     position: "relative",
@@ -326,7 +340,7 @@ const ExploreCreator: React.FC = () => {
       </button> */}
 
       <div style={{ marginLeft: "20px" }}>
-        <CustomButton variant="contained">Enter</CustomButton>
+        <CustomButton variant="contained" onClick={handleClick}>Enter</CustomButton>
       </div>
     </div >
   );
