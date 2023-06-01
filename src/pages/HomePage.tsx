@@ -1,6 +1,8 @@
 import React from "react";
 import EquationCreator from "../components/EquationCreator";
 import { Grid, GridItem } from "@chakra-ui/react";
+import { ControlPanel } from "../components/ControlPanel";
+import { ConceptSearchBar } from "../components/ConceptSearchBar";
 
 const HomePage: React.FC = () => {
   return (
@@ -16,20 +18,20 @@ const HomePage: React.FC = () => {
       color='blackAlpha.700'
       fontWeight='bold'
     >
-      <GridItem pl='2' bg='orange.300' area={'controlpanel'}>
-        Control Panel
+      <GridItem p={3} bg='orange.300' area={'controlpanel'}>
+        <ControlPanel />
       </GridItem>
-      <GridItem pl='2' bg='pink.300' area={'searchbar'}>
-        Concept Search Bar
+      <GridItem p={3} bg='pink.300' area={'searchbar'}>
+        <ConceptSearchBar />
       </GridItem>
-      <GridItem pl='2' bg='green.300' area={'main'}>
+      <GridItem p={3} bg='green.300' area={'main'}>
         Equation
         <EquationCreator />
       </GridItem>
-      <GridItem pl='2' bg='gray.300' area={'results'}>
+      <GridItem p={3} bg='gray.300' area={'results'}>
         Results
       </GridItem>
-      <GridItem pl='2' bg='blue.300' area={'footer'}>
+      <GridItem p={3} bg='blue.300' area={'footer'}>
         Footer
       </GridItem>
     </Grid>

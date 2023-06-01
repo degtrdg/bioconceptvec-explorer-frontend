@@ -1,5 +1,5 @@
 import { RecoilRoot, useRecoilValue } from "recoil";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, Text } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import theme from "./theme";
@@ -23,7 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/explore" element={<ExplorePage />} />
-            <Route path="*" element={<div>404</div>} />
+            <Route path="*" element={<Text pt="10vh">404</Text>} />
           </Routes>
         </BrowserRouter>
       </ChakraProvider>
