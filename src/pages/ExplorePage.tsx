@@ -12,7 +12,6 @@ import {
 // OPEN_AI_KEY="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"
 // const API_KEY = "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";
 const API_KEY = process.env.REACT_APP_OPEN_AI_KEY;
-console.log("API_KEY:", API_KEY);
 
 const systemMessage = {
   role: "system",
