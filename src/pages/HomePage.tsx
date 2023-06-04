@@ -10,9 +10,9 @@ const HomePage: React.FC = () => {
     <Grid
       templateAreas={`"controlpanel controlpanel controlpanel"
                   "searchbar main results"
-                  "searchbar footer footer"`}
+                  "searchbar main results "`}
       gridTemplateRows={"2fr 8fr 0.5fr"}
-      gridTemplateColumns={"1fr 5fr 2fr"}
+      gridTemplateColumns={"1fr 5fr 4fr"}
       h="100vh"
       pt="10vh"
       gap="1"
@@ -32,9 +32,6 @@ const HomePage: React.FC = () => {
       <GridItem p={3} bg="gray.300" area={"results"}>
         {/* Results */}
         <ExplorePage />
-      </GridItem>
-      <GridItem p={3} bg="blue.300" area={"footer"}>
-        Footer
       </GridItem>
     </Grid>
   );

@@ -1,5 +1,5 @@
 import { Flex, FormControl, FormHelperText, FormLabel, useColorModeValue } from "@chakra-ui/react";
-import * as React from "react";
+import * as React from "react"
 import {
     AutoComplete,
     AutoCompleteInput,
@@ -7,12 +7,21 @@ import {
     AutoCompleteList,
 } from "@choc-ui/chakra-autocomplete";
 import { Item } from "@choc-ui/chakra-autocomplete";
-import { loadingState } from "../atoms";
+import { expressionAtom, loadingState } from "../atoms";
 import { useRecoilState } from "recoil";
 
 export const ConceptSearchBar = () => {
+    const [expression, setExpression] = useRecoilState(expressionAtom)
+
     const addConceptToEq = (params: { item: Item, selectMethod: "mouse" | "keyboard" | null, isNewInput?: boolean }) => {
         console.log(params.item.value)
+        if (expression.length === 1 && expression[0] === "") {
+            setExpression([params.item.value])
+        } else if (expression[-1] !== "+") {
+            setExpression([...expression, "+", params.item.value]);
+        } else {
+            setExpression([...expression, params.item.value]);
+        }
     }
 
     const [searchLoading, setSearchLoading] = useRecoilState(loadingState)

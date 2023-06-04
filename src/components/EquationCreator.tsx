@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Autosuggest from "react-autosuggest";
 import { StyleSheet, css } from "aphrodite";
-
-// Interface for token objects
-interface Token {
-  type: "token" | "operator";
-  value: string;
-}
+import { useRecoilState } from "recoil";
+import { expressionAtom } from "../atoms";
+import { Box } from "@chakra-ui/react";
 
 const autosuggestStyles = StyleSheet.create({
   container: {
@@ -47,10 +44,7 @@ const styledAutosuggestStyles = {
 
 const ExploreCreator: React.FC = () => {
   // State variables
-  const [equation, setEquation] = useState<{ left: Token[]; right: Token[] }>({
-    left: [],
-    right: [],
-  });
+  const [expression, setExpression] = useRecoilState(expressionAtom);
   const [input, setInput] = useState("");
   const [selectedSide, setSelectedSide] = useState<"left" | "right">("left");
   const [isFocused, setIsFocused] = useState(false);
@@ -58,26 +52,32 @@ const ExploreCreator: React.FC = () => {
     side: "left" | "right";
     index: number;
   } | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[][]>([]);
 
-  // Arrays of valid tokens and operators
-  const validTokens = ["apple", "banana", "bananas", "cherry"];
-  const validOperators = ["+", "-"];
 
-  // Function to get suggestions
-  const getSuggestions = (value: string) => {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    return inputLength === 0
-      ? []
-      : validTokens.filter(
-          (token) => token.toLowerCase().slice(0, inputLength) === inputValue
-        );
-  };
+  useEffect(() => {
+    let suggestions_: string[][] = []
+    let expression_ = expression.filter((token) => token != "+" && token != "-");
+    expression_.forEach((token, idx) => {
+      // make api call for top k and save to state
+      fetch(`https://shreyj1729--bioconceptvec-get-similar-concepts.modal.run?query=${token}`, {
+        method: 'POST',
+        body: JSON.stringify({ token: token, topn: 10 }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json()).then(data => {
+        console.log(data)
+        suggestions.push(data)
+      }).catch(err => {
+        console.log(err)
+      })
+    })
+    setSuggestions(suggestions_)
+  }, [expression])
 
   // Function to get suggestion value
-  const getSuggestionValue = (suggestion: string) => suggestion;
+  // const getSuggestionValue = (suggestion: string) => suggestion;
 
   // Function to render suggestion
   const renderSuggestion = (suggestion: string, { isHighlighted }: any) => (
@@ -97,11 +97,6 @@ const ExploreCreator: React.FC = () => {
     setInput(newValue);
   };
 
-  // Function to handle suggestions fetch requested
-  const onSuggestionsFetchRequested = ({ value }: any) => {
-    setSuggestions(getSuggestions(value));
-  };
-
   // Function to handle suggestions clear requested
   const onSuggestionsClearRequested = () => {
     setSuggestions([]);
@@ -113,194 +108,66 @@ const ExploreCreator: React.FC = () => {
     value: input,
     onChange: onChange,
   };
-  // Function to validate and add a token to the equation
-  const validateAndAddToken = (token: string) => {
-    const pieces = token.split(" ").filter((t) => t !== "");
-    pieces.forEach((piece) => {
-      if (validTokens.includes(piece)) {
-        setEquation((prev) => {
-          const updatedTokens = [
-            ...prev[selectedSide],
-            { type: "token", value: piece },
-          ];
-          const updatedEquation = { ...prev, [selectedSide]: updatedTokens };
-          console.log("Updated Equation:", updatedEquation); // Log the updated equation
-          return updatedEquation;
-        });
-      } else if (
-        validOperators.includes(piece) &&
-        equation[selectedSide].length
-      ) {
-        setEquation((prev) => {
-          const lastToken = prev[selectedSide][prev[selectedSide].length - 1];
-          if (lastToken?.type !== "operator") {
-            const updatedTokens = [
-              ...prev[selectedSide],
-              { type: "operator", value: piece },
-            ];
-            const updatedEquation = { ...prev, [selectedSide]: updatedTokens };
-            console.log("Updated Equation:", updatedEquation); // Log the updated equation
-            return updatedEquation;
-          }
-          return prev;
-        });
-      }
-    });
-    setInput("");
-  };
-
-  // Event handler for input change
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setInput(value);
-    if (value.endsWith(" ")) {
-      // Validate and add token when a space is entered
-      validateAndAddToken(value.trim());
-    }
-  };
-
-  // Event handler for side change
-  const handleSideChange = (side: "left" | "right") => {
-    // Clear input and set the selected side
-    setInput("");
-    setSelectedSide(side);
-    setIsFocused(true);
-  };
-
-  // useEffect to handle input change
-  useEffect(() => {
-    if (input.endsWith(" ")) {
-      const token = input.trim();
-      if (validTokens.includes(token)) {
-        // Add a valid token to the equation
-        setEquation((prev) => {
-          const updatedTokens = [
-            ...prev[selectedSide],
-            { type: "token", value: token },
-          ];
-          return { ...prev, [selectedSide]: updatedTokens };
-        });
-      } else if (
-        validOperators.includes(token) &&
-        equation[selectedSide].length &&
-        equation[selectedSide][equation[selectedSide].length - 1]?.type !==
-          "operator"
-      ) {
-        // Add a valid operator to the equation
-        setEquation((prev) => {
-          const updatedTokens = [
-            ...prev[selectedSide],
-            { type: "operator", value: token },
-          ];
-          return { ...prev, [selectedSide]: updatedTokens };
-        });
-      }
-      setInput("");
-    }
-  }, [input, selectedSide, equation, validTokens, validOperators]);
-
-  // useEffect to handle backspace
-  useEffect(() => {
-    const handleBackspace = (event: KeyboardEvent) => {
-      if (event.key === "Backspace" && input === "" && selectedToken) {
-        setEquation((prev) => {
-          const updatedTokens = [...prev[selectedToken.side]];
-          updatedTokens.splice(selectedToken.index, 1);
-          if (updatedTokens[selectedToken.index]?.type === "operator") {
-            updatedTokens.splice(selectedToken.index, 1);
-          }
-          return { ...prev, [selectedToken.side]: updatedTokens };
-        });
-        setSelectedToken(null);
-      }
-    };
-
-    window.addEventListener("keydown", handleBackspace);
-    return () => window.removeEventListener("keydown", handleBackspace);
-  }, [selectedSide, input, selectedToken]);
 
   return (
-    <div className="flex items-center justify-center">
-      <div
-        onClick={() => handleSideChange("left")}
-        className="border p-4 flex flex-row space-x-4"
-      >
-        {/* Render tokens on the left side of the equation */}
-        {equation.left.map((token, index) => (
-          <div
-            key={index}
-            className={`px-2 py-1 rounded ${
-              token.type === "token" ? "bg-green-200" : "bg-blue-200"
-            } ${
-              selectedToken?.side === "left" && selectedToken?.index === index
-                ? "border-2 border-red-500"
-                : ""
-            }`}
-            onClick={() => setSelectedToken({ side: "left", index })}
-          >
-            {token.value}
-          </div>
-        ))}
-        {/* Render an input field on the left side if it is selected and focused */}
-        {selectedSide === "left" && isFocused && (
-          <div
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          >
-            <Autosuggest
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={onSuggestionsClearRequested}
-              getSuggestionValue={getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={inputProps}
-              shouldRenderSuggestions={() => true} // This allows empty suggestions to be rendered
-              theme={styledAutosuggestStyles} // Use the styledAutosuggestStyles object
-            />
-          </div>
-        )}{" "}
-      </div>
-      <div className="mx-4 text-2xl">=</div>
-      <div
-        onClick={() => handleSideChange("right")}
-        className="border p-4 flex flex-row space-x-4"
-      >
-        {/* Render tokens on the right side of the equation */}
-        {equation.right.map((token, index) => (
-          <div
-            key={index}
-            className={`px-2 py-1 rounded ${
-              token.type === "token" ? "bg-green-200" : "bg-blue-200"
-            } ${
-              selectedToken?.side === "right" && selectedToken?.index === index
-                ? "border-2 border-red-500"
-                : ""
-            }`}
-            onClick={() => setSelectedToken({ side: "right", index })}
-          >
-            {token.value}
-          </div>
-        ))}{" "}
-        {/* Render an input field on the right side if it is selected and focused */}
-        {selectedSide === "right" && isFocused && (
-          <div
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          >
-            <Autosuggest
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={onSuggestionsClearRequested}
-              getSuggestionValue={getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={inputProps}
-              shouldRenderSuggestions={() => true} // This allows empty suggestions to be rendered
-              theme={styledAutosuggestStyles} // Use the styledAutosuggestStyles object
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <>
+      <Box mt={5}>
+        {expression.map((token, i) => {
+          return (
+            <Box
+              p={2}
+              border="1px"
+              key={i}
+              as="span"
+              color={selectedToken?.index === i ? "blue.900" : "whiteAlpha.900"}
+              bg={selectedToken?.index === i ? "blue.100" : "blackAlpha.700"}
+              // if selected token, hand on hover
+              cursor={selectedToken?.index === i ? "pointer" : "default"}
+              onClick={() => {
+                setSelectedToken({ side: selectedSide, index: i });
+              }}
+            >
+              {token}
+            </Box>
+          );
+        })}
+      </Box>
+
+      <Box>
+        {/* map over equation terms, for each show list of similar terms */}
+        {expression.map((token, i) => {
+          return (
+            <>
+              {suggestions[i] && suggestions[i].length > 0 && (
+                <Box>
+                  {suggestions[i].map((suggestion: string, j: number) => {
+                    return (
+                      <Box
+                        p={2}
+                        border="1px"
+                        key={j}
+                        as="span"
+                        color={selectedToken?.index === i ? "blue.900" : "whiteAlpha.900"}
+                        bg={selectedToken?.index === i ? "blue.100" : "blackAlpha.700"}
+                        // if selected token, hand on hover
+                        cursor={selectedToken?.index === i ? "pointer" : "default"}
+                        onClick={() => {
+                          setSelectedToken({ side: selectedSide, index: i });
+                        }}
+                      >
+                        {suggestion}
+                      </Box>
+                    );
+
+                  })}
+                </Box>
+              )
+              }
+            </>
+          )
+        })}
+      </Box >
+    </>
   );
 };
 
