@@ -22,7 +22,7 @@ export const ConceptSearchBar = () => {
         if (query.length > 0) {
             console.log(query)
             setSearchLoading(true)
-            fetch(`https://shreyj1729--autosuggest.modal.run/?query=${query}&limit=100`)
+            fetch(`https://shreyj1729--bioconceptvec-autosuggest.modal.run/?query=${query}&limit=100`)
                 .then(response => response.json())
                 .then(data => {
                     setConcepts(data)
@@ -33,15 +33,6 @@ export const ConceptSearchBar = () => {
                 });
         }
     }
-
-    // React.useEffect(() => {
-    //     console.log("setting loading to false")
-    //     if (numReqs === 0) {
-    //         // console.log("setting loading to false")
-    //         setSearchLoading(false)
-    //     }
-    // }, [numReqs, setSearchLoading])
-
 
     const [concepts, setConcepts] = React.useState(["type to see results..."])
 
