@@ -10,6 +10,7 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 
 const API_KEY = process.env.REACT_APP_OPEN_AI_KEY;
+console.log(API_KEY);
 
 const systemMessage = {
   role: "system",
