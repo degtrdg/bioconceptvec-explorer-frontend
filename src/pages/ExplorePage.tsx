@@ -9,8 +9,6 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
-// OPEN_AI_KEY="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"
-// const API_KEY = "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";
 const API_KEY = process.env.REACT_APP_OPEN_AI_KEY;
 
 const systemMessage = {
